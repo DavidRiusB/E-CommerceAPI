@@ -1,0 +1,40 @@
+[
+  {
+    "email": "user1@example.com",
+    "name": "User One",
+    "phone": "+1-418-543-8090",
+    "address": "123 Main St",
+    "country": "Country One",
+    "city": "City One",
+    "password": "Password1@"
+  },
+  {
+    "email": "user2@example.com",
+    "name": "User Two",
+    "phone": "+1-587-530-2271",
+    "address": "456 Elm St",
+    "country": "Country Two",
+    "city": "City Two",
+    "password": "Passw0rd2@"
+  },
+  {
+    "email": "admin@example.com",
+    "name": "admin",
+    "phone": "+1-404-724-1937",
+    "address": "456 Elm St",
+    "country": "Country admin",
+    "city": "City admin",
+    "password": "PasswordAdmin1*",
+    "role": "admin"
+  },
+  {
+    "email": "superAdmin@example.com",
+    "name": "superAdmin",
+    "phone": "+1-443-307-1473",
+    "address": "456 Elm St",
+    "country": "Country superAdmin",
+    "city": "City Two",
+    "password": "PasSuperAdmin1*",
+    "role": "superadmin"
+  }
+]
