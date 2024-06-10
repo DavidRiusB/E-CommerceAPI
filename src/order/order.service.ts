@@ -95,7 +95,8 @@ export class OrderService {
         const discountedTotal = totalPrice * discountFactor;
 
         // Add shipping to the total
-        const finalTotal = discountedTotal + shippingCost;
+        let finalTotal = discountedTotal + shippingCost;
+        finalTotal = parseFloat(finalTotal.toFixed(2));
 
         const orderData = {
           user,

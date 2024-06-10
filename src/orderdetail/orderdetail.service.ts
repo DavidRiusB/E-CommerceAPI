@@ -9,12 +9,15 @@ import { OrderDetailRepository } from './orderdetail.repository';
 import { OrderDetail } from './orderdetail.entity';
 import { UpdateDetailDto } from './update-detail.dto';
 import { ProductService } from 'src/product/product.service';
+import { DataSource } from 'typeorm';
+import { Product } from 'src/product/product.entity';
 
 @Injectable()
 export class OrderDetailService {
   constructor(
     private readonly orderDetailRepository: OrderDetailRepository,
     private readonly productService: ProductService,
+    private dataSource: DataSource,
   ) {}
 
   /**
@@ -50,27 +53,57 @@ export class OrderDetailService {
    */
   async update(id: string, detailData: UpdateDetailDto) {
     try {
-      const { newProduct, quantity = 1, discount } = detailData;
+      return await this.dataSource.transaction(async (manager) => {
+        const { newProduct, quantity, discount } = detailData;
 
-      const detail = await this.getById(id);
+        const detail = await this.getById(id);
 
-      if (newProduct) {
-        const product = await this.productService.getProductById(newProduct);
-        // Ensure the quantity is within the available stock
-        if (quantity > product.stock) {
-          throw new BadRequestException('Insufficient product stock');
+        if (newProduct) {
+          const product = await this.productService.getProductById(newProduct);
+          if (quantity !== undefined && quantity !== null) {
+            // Ensure the quantity is within the available stock
+            if (quantity > product.stock) {
+              throw new BadRequestException('Insufficient product stock');
+            }
+
+            // Update product stock before saving
+            product.stock -= quantity;
+            await manager.save(Product, product);
+
+            // Update the order detail with the new product and quantity
+            detail.product = product;
+            detail.quantity = quantity;
+          } else {
+            // Update the order detail with the new product only
+            detail.product = product;
+          }
+        } else if (quantity) {
+          // Update the existing product's stock and order detail quantity if quantity is provided without changing the product
+          if (quantity > detail.product.stock) {
+            throw new BadRequestException('Insufficient product stock');
+          }
+
+          detail.product.stock -= quantity - detail.quantity;
+          await manager.save(Product, detail.product);
+
+          detail.quantity = quantity;
         }
-        detail.product = product;
-        detail.quantity = quantity;
+
+        // Apply discount if provided
         if (discount) {
-          const discountAmount = (product.price * discount) / 100;
-          detail.price = (product.price - discountAmount) * quantity;
+          const discountAmount = (detail.product.price * discount) / 100;
+          let finalPrice =
+            (detail.product.price - discountAmount) * detail.quantity;
+          detail.price = parseFloat(finalPrice.toFixed(2));
         } else {
-          detail.price = product.price * quantity;
+          // Update price based on new quantity if discount is not provided
+          let finalPrice = detail.product.price * detail.quantity;
+          detail.price = parseFloat(finalPrice.toFixed(2));
         }
-      }
 
-      return await this.orderDetailRepository.update(detail);
+        // Save the updated order detail
+        return await manager.save(OrderDetail, detail);
+      });
     } catch (error) {
       if (
         error instanceof NotFoundException ||
