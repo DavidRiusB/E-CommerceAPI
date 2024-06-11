@@ -4,6 +4,7 @@ import { Order } from 'src/order/order.entity';
 import { Product } from 'src/product/product.entity';
 import {
   Column,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -24,7 +25,10 @@ export class OrderDetail {
     type: () => Order,
     description: 'The order associated with the detail',
   })
-  @ManyToOne(() => Order, (order) => order.details)
+  @ManyToOne(() => Order, (order) => order.details, {
+    onDelete: 'CASCADE',
+    cascade: ['soft-remove'],
+  })
   order: Order;
 
   @ApiProperty({
@@ -72,4 +76,7 @@ export class OrderDetail {
     default: OrderDetailStatus.Pending,
   })
   status: OrderDetailStatus;
+
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deletedAt?: Date;
 }

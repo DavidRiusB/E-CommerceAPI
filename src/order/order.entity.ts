@@ -4,6 +4,7 @@ import { OrderDetail } from 'src/orderdetail/orderdetail.entity';
 import { User } from 'src/user/user.entity';
 import {
   Column,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -73,4 +74,10 @@ export class Order {
   })
   @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.Pending })
   status: OrderStatus;
+
+  @DeleteDateColumn({
+    type: 'timestamp',
+    nullable: true,
+  })
+  deletedAt?: Date;
 }

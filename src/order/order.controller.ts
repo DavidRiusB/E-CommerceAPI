@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -104,5 +105,11 @@ export class OrderController {
     @Body() order: OrderDto,
   ) {
     return await this.orderService.updateOrder(id, order);
+  }
+
+  @Delete(':id')
+  @Roles(Role.Admin, Role.SuperAdmin)
+  async softDeleteOrder(@Param('id', CustomParseUUIDPipe) id: string) {
+    return await this.orderService.softDelete(id);
   }
 }

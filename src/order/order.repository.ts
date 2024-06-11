@@ -91,4 +91,9 @@ export class OrderRepository {
       relations: ['user', 'details'],
     });
   }
+
+  /* async softDelete(id: string) {
+    const result = await this.orderRepository.softDelete(id);
+    return result;
+  } */
 }

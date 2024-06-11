@@ -181,4 +181,29 @@ export class OrderService {
       throw new InternalServerErrorException('Fail to update order Status');
     }
   }
+
+  async softDelete(id: string): Promise<Order> {
+    try {
+      return await this.dataSource.transaction(async (manager) => {
+        const order = await this.findOrderById(id);
+        await manager.softRemove(Order, order);
+
+        for (const detail of order.details) {
+          await manager.softRemove(OrderDetail, detail);
+        }
+
+        return order;
+      });
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof InternalServerErrorException
+      ) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Unexpected error occurred during soft delete',
+      );
+    }
+  }
 }
