@@ -17,6 +17,9 @@ const config = {
   synchronize: true, // Do not use synchronize in production
   logging: true,
   //dropSchema: true,
+  cli: {
+    migrationsDir: 'src/migrations',
+  },
 };
 export default registerAs('typeorm', () => config);
 export const connectionSource = new DataSource(config as DataSourceOptions);
