@@ -24,9 +24,6 @@ jobs:
       - name: Build the project
         run: npm run build
 
-      - name: Run migrations
-        run: npm run migration:run
-
       - name: Deploy to Render
         env:
           RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
